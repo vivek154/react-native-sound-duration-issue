@@ -5,7 +5,7 @@
  * @format
  */
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import type {PropsWithChildren} from 'react';
 import {
   SafeAreaView,
@@ -13,9 +13,12 @@ import {
   StatusBar,
   StyleSheet,
   Text,
+  TouchableOpacity,
   useColorScheme,
   View,
 } from 'react-native';
+import Sound from 'react-native-sound';
+import SoundPlayer, { SoundPlayerEventData } from 'react-native-sound-player';
 
 import {
   Colors,
@@ -31,6 +34,7 @@ type SectionProps = PropsWithChildren<{
 
 function Section({children, title}: SectionProps): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
+
   return (
     <View style={styles.sectionContainer}>
       <Text
@@ -56,42 +60,41 @@ function Section({children, title}: SectionProps): React.JSX.Element {
 }
 
 function App(): React.JSX.Element {
+  const [si,setSi]=useState()
   const isDarkMode = useColorScheme() === 'dark';
+  useEffect(()=>{
+    const sound = new Sound(require('./src/audio/coldplay.mp3'),(err:any)=>{
+      if (err) {
+        
+        console.log("err....",err);
+      }
+      else {
+        console.log("duration....",sound?.getDuration())
+        setSi(sound)
+      }
+      
+    },[])
 
+    // SoundPlayer.playAsset(require('./src/audio/Coldplay-Viva-La-Vida.mp3'))
+    // const onComplete =(data: SoundPlayerEventData)=>{
+    //   console.log("played ...",data.success)
+    // }
+    // const listener = SoundPlayer.addEventListener('FinishedPlaying',onComplete)
+    // return ()=> listener.remove()
+  })
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
+    <SafeAreaView style={{...backgroundStyle,flex:1,backgroundColor:'red'}}>
+      <View style={{justifyContent:'center',alignItems:'center'}}>
+        <TouchableOpacity 
+        onPress={()=>console.log(si?.getDuration())}
+        style={{backgroundColor:'white',width:100,height:70}}>
+
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }
